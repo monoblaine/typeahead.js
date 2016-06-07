@@ -1,7 +1,10 @@
 {
     "name": "twitter/typeahead.js",
     "description": "fast and fully-featured autocomplete library",
-    "keywords": ["typeahead", "autocomplete"],
+    "keywords": [
+        "typeahead",
+        "autocomplete"
+    ],
     "homepage": "http://twitter.github.com/typeahead.js",
     "authors": [
         {
@@ -13,5 +16,6 @@
         "issues": "https://github.com/twitter/typeahead.js/issues"
     },
     "author": "Twitter Inc.",
-    "license": "MIT"
+    "license": "MIT",
+    "version": "0.11.1-m1"
 }
