@@ -53,6 +53,8 @@ var Input = (function() {
       this.getHint =
       this.clearHint =
       this.clearHintIfInvalid = _.noop;
+
+      this.$input.addClass('tt-nohint');
     }
   }
 
