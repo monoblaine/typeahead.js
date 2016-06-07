@@ -1,7 +1,7 @@
 /*!
  * typeahead.js 0.11.1
  * https://github.com/twitter/typeahead.js
- * Copyright 2013-2015 Twitter, Inc. and other contributors; Licensed MIT
+ * Copyright 2013-2016 Twitter, Inc. and other contributors; Licensed MIT
  */
 
 (function(root, factory) {
@@ -157,13 +157,19 @@
         return {
             nonword: nonword,
             whitespace: whitespace,
+            whitespace_slugged: whitespace_slugged,
             obj: {
                 nonword: getObjTokenizer(nonword),
-                whitespace: getObjTokenizer(whitespace)
+                whitespace: getObjTokenizer(whitespace),
+                whitespace_slugged: getObjTokenizer(whitespace_slugged)
             }
         };
         function whitespace(str) {
             str = _.toStr(str);
+            return str ? str.split(/\s+/) : [];
+        }
+        function whitespace_slugged(str) {
+            str = _.toStr(str).toSlug(" ");
             return str ? str.split(/\s+/) : [];
         }
         function nonword(str) {
@@ -1367,6 +1373,7 @@
             this._checkLanguageDirection();
             if (this.$hint.length === 0) {
                 this.setHint = this.getHint = this.clearHint = this.clearHintIfInvalid = _.noop;
+                this.$input.addClass("tt-nohint");
             }
         }
         Input.normalizeQuery = function(str) {
@@ -1720,8 +1727,9 @@
                     suggestions = suggestions || [];
                     if (!canceled && rendered < that.limit) {
                         that.cancel = $.noop;
+                        suggestions = suggestions.slice(0, that.limit - rendered);
+                        that._append(query, suggestions);
                         rendered += suggestions.length;
-                        that._append(query, suggestions.slice(0, that.limit - rendered));
                         that.async && that.trigger("asyncReceived", query);
                     }
                 }
