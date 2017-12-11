@@ -63,6 +63,6 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
   },
-  "version": "0.11.1-m2",
+  "version": "0.11.1-m3",
   "main": "dist/typeahead.bundle.js"
 }
