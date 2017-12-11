@@ -1,7 +1,7 @@
 /*!
- * typeahead.js 0.11.1-m1
+ * typeahead.js 0.11.1-m3
  * https://github.com/twitter/typeahead.js
- * Copyright 2013-2016 Twitter, Inc. and other contributors; Licensed MIT
+ * Copyright 2013-2017 Twitter, Inc. and other contributors; Licensed MIT
  */
 
 (function(root, factory) {
@@ -1053,6 +1053,8 @@
             this.minLength = _.isNumber(o.minLength) ? o.minLength : 1;
             this.input = o.input;
             this.menu = o.menu;
+            this.doNotUpdateInputOnCursorChange = this.input.$input.data("doNotUpdateInputOnCursorChange") === true;
+            this.disableTabKeyHandler = this.input.$input.data("disableTabKeyHandler") === true;
             this.enabled = true;
             this.active = false;
             this.input.hasFocus() && this.activate();
@@ -1128,6 +1130,9 @@
                 }
             },
             _onTabKeyed: function onTabKeyed(type, $e) {
+                if (this.disableTabKeyHandler === true) {
+                    return;
+                }
                 var $selectable;
                 if ($selectable = this.menu.getActiveSelectable()) {
                     this.select($selectable) && $e.preventDefault();
@@ -1252,7 +1257,9 @@
             select: function select($selectable) {
                 var data = this.menu.getSelectableData($selectable);
                 if (data && !this.eventBus.before("select", data.obj)) {
-                    this.input.setQuery(data.val, true);
+                    if (this.doNotUpdateInputOnCursorChange !== true) {
+                        this.input.setQuery(data.val, true);
+                    }
                     this.eventBus.trigger("select", data.obj);
                     this.close();
                     return true;
@@ -1280,11 +1287,13 @@
                 cancelMove = this._minLengthMet() && this.menu.update(query);
                 if (!cancelMove && !this.eventBus.before("cursorchange", payload)) {
                     this.menu.setCursor($candidate);
-                    if (data) {
-                        this.input.setInputValue(data.val);
-                    } else {
-                        this.input.resetInputValue();
-                        this._updateHint();
+                    if (!this.doNotUpdateInputOnCursorChange) {
+                        if (data) {
+                            this.input.setInputValue(data.val);
+                        } else {
+                            this.input.resetInputValue();
+                            this._updateHint();
+                        }
                     }
                     this.eventBus.trigger("cursorchange", payload);
                     return true;
