@@ -37,6 +37,9 @@ var Typeahead = (function() {
     this.input = o.input;
     this.menu = o.menu;
 
+    this.doNotUpdateInputOnCursorChange = this.input.$input.data('doNotUpdateInputOnCursorChange') === true;
+    this.disableTabKeyHandler = this.input.$input.data('disableTabKeyHandler') === true;
+
     this.enabled = true;
 
     // activate the typeahead on init if the input has focus
@@ -167,6 +170,10 @@ var Typeahead = (function() {
     },
 
     _onTabKeyed: function onTabKeyed(type, $e) {
+      if (this.disableTabKeyHandler === true) {
+        return;
+      }
+
       var $selectable;
 
       if ($selectable = this.menu.getActiveSelectable()) {
@@ -348,7 +355,9 @@ var Typeahead = (function() {
       var data = this.menu.getSelectableData($selectable);
 
       if (data && !this.eventBus.before('select', data.obj)) {
-        this.input.setQuery(data.val, true);
+        if (this.doNotUpdateInputOnCursorChange !== true) {
+          this.input.setQuery(data.val, true);
+        }
 
         this.eventBus.trigger('select', data.obj);
         this.close();
@@ -393,15 +402,17 @@ var Typeahead = (function() {
       if (!cancelMove && !this.eventBus.before('cursorchange', payload)) {
         this.menu.setCursor($candidate);
 
-        // cursor moved to different selectable
-        if (data) {
-          this.input.setInputValue(data.val);
-        }
+        if (!this.doNotUpdateInputOnCursorChange) {
+          // cursor moved to different selectable
+          if (data) {
+            this.input.setInputValue(data.val);
+          }
 
-        // cursor moved off of selectables, back to input
-        else {
-          this.input.resetInputValue();
-          this._updateHint();
+          // cursor moved off of selectables, back to input
+          else {
+            this.input.resetInputValue();
+            this._updateHint();
+          }
         }
 
         this.eventBus.trigger('cursorchange', payload);
